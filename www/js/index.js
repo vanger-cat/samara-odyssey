@@ -31,8 +31,9 @@ var init = function(){
 
             $('#login a').click(function(e){
                 var id = 'EZEDVJFRCCRXAPQRVMJJM1XUETBCEAU53RY40VI0LEUOW1Z1',
-                    secret = '12YBZID4MUFPVO4SRP3HKMARVM415ERM541KKZ0UH4ZANGVE',
-                    callback = 'http://app-test.samara-odyssey.dansamara.ru/';
+                    secret = 'G3GDOMAJA2R3HZ453WATUI0SM43JV41YSV51EHQMJ4HK0UKV',
+                    callback = encodeURIComponent(document.URL);
+                    
 
                 fsclient = new FourSquareClient(id, secret, callback, true);
 
@@ -48,7 +49,7 @@ var init = function(){
 
             if(!fsclient.accessToken){
                 $('#login').show();
-                $('#debug').append('<p>URL: ' + document.URL + '</p>');
+                //$('#debug').append('<p>URL: ' + document.URL + '</p>');
             }else{
                 $('#info').show();
                 fsclient.usersClient.users('self', { 
