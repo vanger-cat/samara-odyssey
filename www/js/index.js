@@ -48,6 +48,7 @@ var init = function(){
 
             if(!fsclient.accessToken){
                 $('#login').show();
+                $('#debug').append('<p>URL: ' + document.URL + '</p>');
             }else{
                 $('#info').show();
                 fsclient.usersClient.users('self', { 
