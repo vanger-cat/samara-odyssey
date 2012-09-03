@@ -24,7 +24,20 @@
         <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
         <link rel="stylesheet" type="text/css" href="css/index.css" />
         <title>Hello World</title>
-    </head>
+
+        <script type="text/javascript" src="js/jquery-1.8.1.min.js"></script>
+        <script type="text/javascript" src="js/foursquare/foursquare-api.core.js"></script>
+        <script type="text/javascript" src="js/foursquare/endpoint/foursquare-api.photos.js"></script>
+        <script type="text/javascript" src="js/foursquare/endpoint/foursquare-api.venues.js"></script>
+        <script type="text/javascript" src="js/foursquare/endpoint/foursquare-api.settings.js"></script>
+        <script type="text/javascript" src="js/foursquare/endpoint/foursquare-api.users.js"></script>
+        <script type="text/javascript" src="js/foursquare/endpoint/foursquare-api.checkins.js"></script>
+        <script type="text/javascript" src="js/foursquare/endpoint/foursquare-api.tips.js"></script>
+        <script type="text/javascript" src="js/foursquare/endpoint/foursquare-api.specials.js"></script>
+        <script type="text/javascript" src="js/foursquare/endpoint/foursquare-api.updates.js"></script>
+        <script type="text/javascript" src="js/foursquare/endpoint/foursquare-api.events.js"></script>
+
+</head>
     <body>
         <div class="app">
             <h1>PhoneGap</h1>
@@ -33,6 +46,16 @@
                 <p class="status complete blink hide">Device is Ready</p>
             </div>
         </div>
+        <div id="login">
+            <p>Вы не залогинены в Foursquare.</p>
+            <p><a href="#">Сделать это прямо сейчас!</a></p>
+        </div>
+        <div id="info">
+            <p>Вы залогинены.</p>
+            <p>ID пользователя: <span id="user-id"></span></p>
+            <p>Имя пользователя: <span id="user-name"></span></p>
+            <p>Фото пользователя: <span id="user-foto"></span></p>
+        </div>        
         <script type="text/javascript" src="cordova-2.0.0.js"></script>
         <script type="text/javascript" src="js/index.js"></script>
         <script type="text/javascript">

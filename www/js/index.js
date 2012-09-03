@@ -38,5 +38,45 @@ var app = {
         document.querySelector('#' + id + ' .pending').className += ' hide';
         var completeElem = document.querySelector('#' + id + ' .complete');
         completeElem.className = completeElem.className.split('hide').join('');
+
+        $(document).ready(function(){
+
+            var fsclient = new FourSquareClient(null, null, null, true);
+
+            $('#login a').click(function(e){
+                var id = 'EZEDVJFRCCRXAPQRVMJJM1XUETBCEAU53RY40VI0LEUOW1Z1',
+                    secret = '12YBZID4MUFPVO4SRP3HKMARVM415ERM541KKZ0UH4ZANGVE',
+                    callback = 'http://app-test.samara-odyssey.dansamara.ru/';
+
+                fsclient = new FourSquareClient(id, secret, callback, true);
+
+                var authenticationURL = fsclient.AUTHENTICATION_URL + "?client_id=" + fsclient.clientId;
+                authenticationURL += FourSquareUtils.createQueryString("&", {
+                                     response_type: "token",
+                                     redirect_uri: fsclient.redirectUri
+                                 });
+                window.open(authenticationURL, '_self');
+
+                return e.preventDefault();
+            });
+
+            if(!fsclient.accessToken){
+                $('#login').show();
+            }else{
+                $('#info').show();
+                fsclient.usersClient.users('self', { 
+                    onSuccess: function(data) { 
+                        $('#user-id').html(data.response.user.id);
+                        $('#user-name').html(data.response.user.firstName);
+                        $('#user-foto').html('<img src="' + data.response.user.photo + '"/>');
+                        //console.log(data);
+                    },
+                    onFailure: function(data) {
+                        alert('Не могу получить информацию о пользователе!');
+                    }
+                });
+            }
+        });
+
     }
 };
