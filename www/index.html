@@ -16,6 +16,8 @@
 	<link rel="stylesheet" href="css/main.css" />
 
 	<script src="js/foursquare.lib.init.js"></script>
+
+	<script src="js/jquery.dump.js"></script>
 </head> 
 
 	
@@ -33,7 +35,8 @@
 			<li><a href="#user-info">Информация о пользователе</a></li>
 			<li><a href="#select-place">Выбор места для чекина (карта+список)</a></li>
 			<!--li><a href="#checkin">Чекин</a></li-->
-			<li><a href="#login"data-rel="dialog" data-transition="pop">Логин в FourSquare</a></li>
+			<li><a href="#login" data-rel="dialog" data-transition="pop">Логин в FourSquare</a></li>
+			<li><a href="http://app-test.samara-odyssey.dansamara.ru/apk.apk">Загрузить APK для Android</a></li>
 		</ul>
 	</div><!-- /content -->
 	
@@ -47,17 +50,12 @@
 	</div><!-- /header -->
 
 	<div data-role="content">	
-		<h2>Карта</h2>
 		<div class="ui-bar-c ui-corner-all ui-shadow pane">
 			<div id="select-place-map"></div>
 		</div>
 
 		<h2>Выберите место</h2>
 		<ul data-inset="true" data-role="listview">
-			<li><a href="#">Место 1</a></li>
-			<li><a href="#">Место 2</a></li>
-			<li><a href="#">Место 3</a></li>
-			<li><a href="#">Место 4</a></li>
 		</ul>
 		<a href="#" data-role="button" data-icon="plus" data-theme="b">Добавить место</a>		
 	</div><!-- /content -->

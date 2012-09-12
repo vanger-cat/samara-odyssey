@@ -32,6 +32,7 @@ $(function() {
     }
 
     function render_user_info_page(){
+        $.mobile.loading('show');
         var fsclient = new FourSquareClient(null, null, null, true);
         fsclient.usersClient.users('self', { 
             onSuccess: function(data) { 
@@ -39,14 +40,50 @@ $(function() {
                 $('#user-info .user-name').html(data.response.user.firstName);
                 $('#user-info .user-avatar').attr('src',data.response.user.photo);
                 //console.log(data);
+                $.mobile.loading('hide');
+                toast('test');
             },
             onFailure: function(data) {
                 alert('Не могу получить информацию о пользователе!');
+                $.mobile.loading('hide');
             }
         });
     }
 
     function render_select_page(){
+        var fsclient = new FourSquareClient(null, null, null, true);
+        var params = { 'll': '53.20445,50.12376', 'radius': 50 };
+        fsclient.venuesClient.explore(params, { 
+            onSuccess: function(data) { 
+                var venues = [];
+                for(var i=0; i < data.response.groups[0].items.length; i++){
+                    item = data.response.groups[0].items[i];
+                    // venues.push({
+                    //     'id': item.venue.id,
+                    //     'name': item.venue.name,
+                    //     'location': { 'lat': item.venue.location.lat, 'lng': item.venue.location.lng},
+                    //     'category': item.venue.categories[0].name
+                    // });
+                    var ll = 'Lat: ' + item.venue.location.lat + '<br/>Lng: ' + item.venue.location.lng;
+                    $('#select-place ul').append(
+                        $('<li>').append($('<a>').attr('href', '#')
+                                                 .append($('<h3>').append(item.venue.name))
+                                                 .append($('<p>').append(item.venue.categories[0].name)))
+                                 .append($('<span class="ui-li-count">').append(ll))
+                    );
+                }
+                $('#select-place ul').listview('refresh');
+                //console.log(data.response.groups);
+                
+                //$('#select-place-debug').html(prettyPrint(data.response));
+                //$.dump(data.response.groups[0].items, true);
+                // $.dump(venues, false);
+            },
+            onFailure: function(data) {
+                alert('Не могу получить информацию о местности!');
+            }
+        });
+        
         // Also works with: var yourStartLatLng = '59.3426606750, 18.0736160278';
         var yourStartLatLng = new google.maps.LatLng(53.21320001, 50.2060001);
         $('#select-place-map').gmap({'center': yourStartLatLng, 'zoom': 11});
@@ -59,6 +96,22 @@ $(function() {
 
         $('#select-place-map').gmap('addMarker', {'position': '57.7973333,12.0502107', 'bounds': false}).click(function() {
             $('#select-place-map').gmap('openInfoWindow', {'content': 'Hello World!'}, this);
+        });
+    }
+
+    var toast=function(msg){
+        $("<div class='ui-loader ui-overlay-shadow ui-body-e ui-corner-all'><h3>"+msg+"</h3></div>")
+        .css({ display: "block",
+        opacity: 0.90,
+        position: "fixed",
+        padding: "7px",
+        "text-align": "center",
+        width: "270px",
+        left: ($(window).width() - 284)/2,
+        top: $(window).height()/2 })
+        .appendTo( $.mobile.pageContainer ).delay( 1500 )
+        .fadeOut( 400, function(){
+        $(this).remove();
         });
     }
 
