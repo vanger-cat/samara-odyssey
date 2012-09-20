@@ -6,7 +6,8 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1"> 
 	<title>Самарская Одиссея</title> 
 	<link rel="stylesheet" href="css/jquery.mobile-1.2.0-beta.1.min.css" />
-	<script src="js/jquery-1.8.1.min.js"></script>
+	<!--script src="js/jquery-1.8.1.min.js"></script-->
+	<script src="js/jquery-1.8.1.js"></script>
 	<script src="js/jquery.mobile-1.2.0-beta.1.min.js"></script>
 
 	<script src="http://maps.google.com/maps/api/js?sensor=true" type="text/javascript"></script>
@@ -23,6 +24,14 @@
 	
 <body> 
 
+<div data-role="page" id="loading">
+	<div data-role="header">
+		<h1>Самарская Одиссея</h1>
+	</div><!-- /header -->
+	<div data-role="content" >	
+	</div>
+</div>
+
 <div data-role="page" id="front">
 
 	<div data-role="header">
@@ -32,6 +41,7 @@
 	<div data-role="content" >	
 		<h2>Что-то более-менее работающее :)</h2>
 		<ul data-role="listview" data-inset="true">
+			<li><a href="#task">Задание для команды</a></li>
 			<li><a href="#user-info">Информация о пользователе</a></li>
 			<li><a href="#select-place">Выбор места для чекина (карта+список)</a></li>
 			<!--li><a href="#checkin">Чекин</a></li-->
@@ -42,10 +52,29 @@
 	
 </div>
 
+<div data-role="page" id="task">
+
+	<div data-role="header">
+		<h1>Задание</h1>
+	</div><!-- /header -->
+
+	<div data-role="content" >	
+		<div class="map"></div>
+
+		<div class="task-wrapper">
+			<h3>Текущее задание</h3>
+			<p class="current-class"></p>
+		</div>
+		
+		<a href="#select-place" data-role="button" data-icon="plus" data-theme="b">Зачекиниться</a>
+	</div><!-- /content -->
+	
+</div>
+
 <div data-role="page" id="select-place">
 
 	<div data-role="header">
-		<a data-rel="back" data-icon="back">Назад</a>
+		<a href="#task" data-icon="back">Назад</a>
 		<h1>Выберите место для чекина</h1>
 	</div><!-- /header -->
 
@@ -57,7 +86,7 @@
 		<h2>Выберите место</h2>
 		<ul data-inset="true" data-role="listview">
 		</ul>
-		<a href="#" data-role="button" data-icon="plus" data-theme="b">Добавить место</a>		
+		<a href="#" data-role="button" data-icon="plus" data-theme="b">Добавить место</a>
 	</div><!-- /content -->
 	
 </div>
@@ -89,16 +118,17 @@
 	</div><!-- /header -->
 
 	<div data-role="content" data-theme="d">	
-		<p>В настоящий момент реального логина не происходит из-за некоторых проблем платформы PhfrontGap.</p>
+		<p>В настоящий момент реального логина не происходит из-за некоторых проблем платформы PhoneGap.</p>
 		<p>Все действия можно тестировать с пользователем Sam-Od. Логин и пароль: <em>n65869@rtrtr.com</em></p>
 		<p>При нажатии на кнопку <strong>Перейти на FourSquare</strong> будут обновлены данные авторизации.</p>
 		<div data-role="collapsible" data-mini="true" data-content-theme="c">
 			<h3>Данные авторизации</h3>
 			<p class="auth-tokens"></p>
+			<p><a class="get_new" href="">Получить новый токен</a> (работает через сервер)</a></p>
 		</div>
 		<p>
-			<a href="#front" data-role="button" data-inline="true" data-icon="check" data-theme="b" class="login">Перейти на FourSquare</a>
-			<a href="#front" data-rel="back" data-role="button" data-inline="true" data-icon="back">Отмена</a>
+			<a href="#loading" data-role="button" data-inline="true" data-icon="check" data-theme="b" class="login">Перейти на FourSquare</a>
+			<a href="#loading" data-rel="back" data-role="button" data-inline="true" data-icon="back">Отмена</a>
 		</p>
 	
 	</div><!-- /content -->

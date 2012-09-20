@@ -2,6 +2,7 @@ $(function() {
     function init(){
         var d = $(document);
         d.bind("pagechange", onPageChange);
+        render_loding_page();
     }
     
     function onPageChange(event, data) {
@@ -10,6 +11,33 @@ $(function() {
             case 'select-place': render_select_page(); break;
             case 'login': render_login_page(); break;
             case 'user-info': render_user_info_page(); break;
+            case 'task': render_task_page(); break;
+            case 'loading': render_loding_page(); break;
+        }
+    }
+
+    function render_loding_page(){
+        // Проверка токена
+        $.mobile.loading('show');
+        try{
+            var switch_to_login = function(){
+                $.mobile.loading('hide');
+                $.mobile.changePage($('#login'));
+            }
+            var fsclient = new FourSquareClient(null, null, null, true);
+            if(fsclient.accessToken){
+                fsclient.usersClient.users('self', {
+                    onSuccess: function(data) {
+                        $.mobile.loading('hide');            
+                        $.mobile.changePage($('#task'));
+                    },
+                    onFailure: switch_to_login
+                });
+            }else{
+                switch_to_login();
+            }
+        } catch(e){
+            switch_to_login();
         }
     }
 
@@ -23,6 +51,12 @@ $(function() {
             list += '<dt>' + key + ':</dt><dd><small>' + access_keys[key] + '</small></dd>';
         };
         $('.auth-tokens').html('<dl>'+list+'</dl>');
+
+        var href_get_new_token = 'https://foursquare.com/oauth2/authenticate?client_id=' + 
+                                 access_keys.fs_client_id + '&response_type=token' + '&redirect_uri=' + 
+                                 access_keys.fs_redirect_uri;
+
+        $('#login a.get_new').attr('href', href_get_new_token);
 
         $('#login a.login').click(function(){
             for (var key in access_keys) {
@@ -50,9 +84,15 @@ $(function() {
         });
     }
 
+    /**
+     * TODO: обновление текущей позиции
+     *       отображение маркера по клику на место (? нужно ли, если радиус - 50м)
+     *       обновление информации только если сменились координаты
+     */
     function render_select_page(){
         var fsclient = new FourSquareClient(null, null, null, true);
         var params = { 'll': '53.20445,50.12376', 'radius': 50 };
+        $('#select-place ul li').remove();
         fsclient.venuesClient.explore(params, { 
             onSuccess: function(data) { 
                 var venues = [];
@@ -97,6 +137,30 @@ $(function() {
         $('#select-place-map').gmap('addMarker', {'position': '57.7973333,12.0502107', 'bounds': false}).click(function() {
             $('#select-place-map').gmap('openInfoWindow', {'content': 'Hello World!'}, this);
         });
+    }
+
+    function render_task_page(){
+        $.ajax({
+            url: 'http://app-test.samara-odyssey.dansamara.ru/actions/task.php',
+            dataType: 'jsonp',
+            success: function(data){
+                if (data.hasOwnProperty('task')) {
+                    $('#task p.current-class').html(data.task);
+                    update_task_map_height();
+                }
+            }
+        });
+        $('#task .map').gmap({'center': '53.21320001, 50.2060001', 'zoom': 13});
+    }
+
+    function update_task_map_height(){
+        // $header = $page.children( ":jqmData(role=header)" ),
+        // $content = $page.children( ":jqmData(role=content)" ),
+        var map_height = $(window).outerHeight() - 
+                        $('#task div[data-role="header"]').outerHeight() - 
+                        $('#task div[data-role="content"]').outerHeight() -
+                        $('#task .map').outerHeight();
+        $('#task .map').height(map_height).gmap('refresh');
     }
 
     var toast=function(msg){
