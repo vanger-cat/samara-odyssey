@@ -19,6 +19,8 @@
 	<script src="js/foursquare.lib.init.js"></script>
 
 	<script src="js/jquery.dump.js"></script>
+
+	<script type="text/javascript" src="cordova-2.0.0.js"></script>
 </head> 
 
 	
@@ -32,26 +34,6 @@
 	</div>
 </div>
 
-<div data-role="page" id="front">
-
-	<div data-role="header">
-		<h1>Самарская Одиссея</h1>
-	</div><!-- /header -->
-
-	<div data-role="content" >	
-		<h2>Что-то более-менее работающее :)</h2>
-		<ul data-role="listview" data-inset="true">
-			<li><a href="#task">Задание для команды</a></li>
-			<li><a href="#user-info">Информация о пользователе</a></li>
-			<li><a href="#select-place">Выбор места для чекина (карта+список)</a></li>
-			<!--li><a href="#checkin">Чекин</a></li-->
-			<li><a href="#login" data-rel="dialog" data-transition="pop">Логин в FourSquare</a></li>
-			<li><a href="http://app-test.samara-odyssey.dansamara.ru/apk.apk">Загрузить APK для Android</a></li>
-		</ul>
-	</div><!-- /content -->
-	
-</div>
-
 <div data-role="page" id="task">
 
 	<div data-role="header">
@@ -59,7 +41,12 @@
 	</div><!-- /header -->
 
 	<div data-role="content" >	
-		<div class="map ui-bar-c ui-corner-all ui-shadow pane"></div>
+		<div class="map-wrapper ui-bar-c ui-corner-all ui-shadow pane">
+			<div class="map"></div>
+			<div class="help">
+				<h1>Тап для обновления карты</h1>
+			</div>
+		</div>
 
 		<div class="task-wrapper">
 			<h3>Текущее задание</h3>
@@ -75,33 +62,42 @@
 
 	<div data-role="header">
 		<a href="#task" data-icon="back">Назад</a>
-		<h1>Выберите место для чекина</h1>
+		<h1>Выбор места для чекина</h1>
 	</div><!-- /header -->
 
 	<div data-role="content">	
-		<h2>Выберите место</h2>
 		<ul data-inset="true" data-role="listview">
 		</ul>
 	</div><!-- /content -->
 	
 </div>
 
-<div data-role="page" id="user-info">
+<div data-role="page" id="checkin">
 
 	<div data-role="header">
 		<a data-rel="back" data-icon="back">Назад</a>
-		<h1>Информация о пользователе</h1>
+		<h1>Checkin</h1>
 	</div><!-- /header -->
 
-	<div data-role="content">	
-		<p>
-			<ul data-role="listview" data-inset="true">
-				<li>
-					<img src="" class="user-avatar"/><h3 class="user-name"></h3>
+	<div data-role="content">
+		<div class="ui-grid-a">
+			<div class="ui-block-a user-info">
+				<div class="ui-bar-c ui-corner-all ui-shadow pane">
+					<img src="" class="user-avatar"/>
+					<h2 class="user-name"></h2>
 					<p class="user-id"></p>
-				</li>
-			</ul>
-		</p>
+				</div>
+			</div>
+			<div class="ui-block-b place-info">
+				<div class="ui-bar-c ui-corner-all ui-shadow pane">
+					<h2 class="place-name"></h2>
+					<p class="place-desc"></p>
+				</div>
+			</div>
+		</div>
+		<h2>Комментарий</h2>
+		<textarea name="textarea" id="comment"></textarea>
+		<a class="checkin" href="#" data-role="button" data-icon="plus" data-theme="b">Зачекиниться</a>
 	</div><!-- /content -->
 	
 </div>
@@ -127,8 +123,17 @@
 		</p>
 	
 	</div><!-- /content -->
-	
-</div><!-- /page popup -->
+</div>
+
+<div data-role="page" id="checkin-result">
+
+	<div data-role="header" data-theme="e">
+		<h1>Checkin в FourSquare</h1>
+	</div><!-- /header -->
+
+	<div data-role="content">	
+	</div><!-- /content -->
+</div>
 
 </body>
 </html>

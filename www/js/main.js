@@ -1,5 +1,7 @@
 $(function() {
-    var app_data = {}
+    var app_data = {
+        'radius': 300
+    }
 
     function init(){
         var d = $(document);
@@ -9,17 +11,19 @@ $(function() {
     }
     
     function onPageInit(event) {
-        var toPageId = $(event.target).attr('id');
-        switch (toPageId) {
-            case 'select-place': render_select_page(); break;
+        switch ($(event.target).attr('id')) {
             case 'login': render_login_page(); break;
-            case 'user-info': render_user_info_page(); break;
             case 'task': render_task_page(); break;
             case 'loading': render_loding_page(); break;
         }
     }
 
     function onPageChange(event, data) {
+        switch(data.toPage.attr('id')){
+            case 'checkin': render_checkin_page(); break;
+            case 'select-place': render_select_page(); break;
+            case 'checkin-result': render_checkin_result_page(); break;
+        }
     }
 
     function render_loding_page(){
@@ -67,36 +71,67 @@ $(function() {
         });
     }
 
-    function render_user_info_page(){
+    function checkin(){
+        var fsclient = new FourSquareClient(null, null, null, true);
+        var params = { 'venueId': app_data.task.location, 'shout': $('#comment').val()};
+        fsclient.checkinsClient.add(params, {
+            onSuccess: function(data){
+                $('#checkin-result div[data-role="content"]').html('OK!');
+                $.mobile.changePage($('#checkin-result'));
+            },
+            onFailure: function(data){
+                alert('FAIL');
+            }
+        });
+    }
+
+    function render_checkin_page(){
         $.mobile.loading('show');
         var fsclient = new FourSquareClient(null, null, null, true);
+        $('#checkin a.checkin').click(checkin);
         fsclient.usersClient.users('self', { 
             onSuccess: function(data) { 
-                $('#user-info .user-id').html(data.response.user.id);
-                $('#user-info .user-name').html(data.response.user.firstName);
-                $('#user-info .user-avatar').attr('src',data.response.user.photo);
+                $('#checkin .user-id').html(data.response.user.id);
+                $('#checkin .user-name').html(data.response.user.firstName);
+                $('#checkin .user-avatar').attr('src',data.response.user.photo);
                 $.mobile.loading('hide');
-                toast('test');
             },
             onFailure: function(data) {
                 alert('Не могу получить информацию о пользователе!');
                 $.mobile.loading('hide');
             }
         });
+        fsclient.venuesClient.venues(app_data.task.location, { 
+            onSuccess: function(data) { 
+                $('#checkin .place-name').html(data.response.venue.name);
+                $('#checkin .place-desc').html(data.response.venue.categories[0].name);
+            },
+            onFailure: function(data) {
+                alert('Не могу получить информацию о месте!');
+            }
+        });
     }
 
-    /**
-     * TODO: обновление текущей позиции
-     *       отображение маркера по клику на место (? нужно ли, если радиус - 50м)
-     *       обновление информации только если сменились координаты
-     */
     function render_select_page(){
-        var fsclient = new FourSquareClient(null, null, null, true);
-        var params = { 'll': '53.20445,50.12376', 'radius': 50 };
-        var checkin = function(id){ alert(id); }
         $('#select-place ul li').remove();
+
+        navigator.geolocation.getCurrentPosition(
+            /*onSuccess*/ function(position){
+                show_places(position.coords);
+            },
+            /*onError*/ function(error){
+            }
+        );
+    }
+
+    function show_places(coords){
+        $.mobile.loading('show');
+        var fsclient = new FourSquareClient(null, null, null, true);
+        var params = { 'll': coords.latitude + ', ' + coords.longitude, 'radius': app_data.radius };
+        var checkin = function(id){ $.mobile.changePage($('#checkin')); }
         fsclient.venuesClient.explore(params, { 
-            onSuccess: function(data) { 
+            onSuccess: function(data) {
+                console.log(data);
                 var venues = [];
                 for(var i=0; i < data.response.groups[0].items.length; i++){
                     item = data.response.groups[0].items[i];
@@ -108,7 +143,7 @@ $(function() {
                     // });
                     var li    = $('<li>'),
                         ll    = 'Lat: ' + item.venue.location.lat + '<br/>Lng: ' + item.venue.location.lng,
-                        desc  = $('<p>').append(item.venue.categories[0].name),// + '<br/>ID: ' + item.venue.id,
+                        desc  = $('<p>').append(item.venue.categories[0].name + ' ID: ' + item.venue.id),
                         title = $('<h3>').append(item.venue.name),
                         count = $('<span class="ui-li-count">').append(ll);
                         console.log(app_data);
@@ -117,18 +152,22 @@ $(function() {
                         .append($('<a>').attr('href', '#').append(title).append(desc).click(checkin))
                         .append(count);
                     }else{
-                        li.append(title).append(desc).append(count);
+                        //li.append(title).append(desc).append(count);
+                      li.append($('<a>').attr('href', '#').append(title).append(desc).click(checkin))
+                        .append(count);
                     }
                     
                     $('#select-place ul').append(li);
                 }
                 $('#select-place ul').listview('refresh');
+                $.mobile.loading('hide');
                 //$('#select-place-debug').html(prettyPrint(data.response));
                 //$.dump(data.response.groups[0].items, true);
                 // $.dump(venues, false);
             },
             onFailure: function(data) {
                 alert('Не могу получить информацию о местности!');
+                $.mobile.loading('hide');
             }
         });
         
@@ -148,6 +187,7 @@ $(function() {
     }
 
     function render_task_page(){
+        //$.mobile.loading('show');
         $.ajax({
             url: 'http://app-test.samara-odyssey.dansamara.ru/actions/task.php',
             dataType: 'jsonp',
@@ -156,20 +196,38 @@ $(function() {
                     $('#task p.current-class').html(data.text);
                     app_data.task = data;
                     update_task_map_height();
+                    $('#task .map').gmap({'center': '53.21320001, 50.2060001', 'zoom': 13});
+                    $('#task .map-wrapper').bind('tap', update_task_map);
                 }
             }
         });
-        $('#task .map').gmap({'center': '53.21320001, 50.2060001', 'zoom': 13});
     }
 
+    function update_task_map(){
+        navigator.geolocation.getCurrentPosition(
+            /*onSuccess*/ function(position){
+                $('#task .map-wrapper h1').hide();
+                var pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+                $('#task .map').gmap('option', 'center', pos).gmap('refresh');
+            },
+            /*onError*/ function(error){
+                $('#task .map-wrapper h1').html('Ошибка: ' + error.message).show();
+            }
+        );
+    }
+
+    // TODO
     function update_task_map_height(){
-        // $header = $page.children( ":jqmData(role=header)" ),
-        // $content = $page.children( ":jqmData(role=content)" ),
-        var map_height = $(window).outerHeight()
-                         - $('#task div[data-role="header"]').outerHeight()
-                         - $('#task div[data-role="content"]').outerHeight()
-                         - $('#task .map').outerHeight();
-        $('#task .map').height(map_height).gmap('refresh');
+        // var content = $('#task div[data-role="content"]'),
+        //     map_height = $(window).outerHeight()
+        //                  - $('#task div[data-role="header"]').outerHeight(true)
+        //                  - $('#task div[data-role="content"]').outerHeight(true)
+        //                  - $('#task .map').outerHeight(true);
+        // $('#task .map-wrapper').height(map_height);
+    }
+
+    function render_checkin_result_page(){
+        
     }
 
     var toast=function(msg){
