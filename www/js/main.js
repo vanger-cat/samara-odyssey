@@ -243,6 +243,7 @@ $(function() {
         .appendTo( $.mobile.pageContainer ).delay( 1500 )
         .fadeOut( 400, function(){ $(this).remove(); });
     }
-
+    
+    document.addEventListener('deviceready', init, false);
     $(init);
 });
