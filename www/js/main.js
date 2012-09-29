@@ -1,12 +1,15 @@
 $(function() {
+    var app_data = {}
+
     function init(){
         var d = $(document);
         d.bind("pagechange", onPageChange);
+        d.bind("pageinit", onPageInit);
         render_loding_page();
     }
     
-    function onPageChange(event, data) {
-        var toPageId = data.toPage.attr("id");
+    function onPageInit(event) {
+        var toPageId = $(event.target).attr('id');
         switch (toPageId) {
             case 'select-place': render_select_page(); break;
             case 'login': render_login_page(); break;
@@ -16,26 +19,25 @@ $(function() {
         }
     }
 
+    function onPageChange(event, data) {
+    }
+
     function render_loding_page(){
         // Проверка токена
         $.mobile.loading('show');
+        var switch_to_login = function(){
+            $.mobile.loading('hide');
+            $.mobile.changePage($('#login'));
+        }
         try{
-            var switch_to_login = function(){
-                $.mobile.loading('hide');
-                $.mobile.changePage($('#login'));
-            }
             var fsclient = new FourSquareClient(null, null, null, true);
-            if(fsclient.accessToken){
-                fsclient.usersClient.users('self', {
-                    onSuccess: function(data) {
-                        $.mobile.loading('hide');            
-                        $.mobile.changePage($('#task'));
-                    },
-                    onFailure: switch_to_login
-                });
-            }else{
-                switch_to_login();
-            }
+            fsclient.usersClient.users('self', {
+                onSuccess: function(data) {
+                    $.mobile.loading('hide');            
+                    $.mobile.changePage($('#task'));
+                },
+                onFailure: switch_to_login
+            });
         } catch(e){
             switch_to_login();
         }
@@ -73,7 +75,6 @@ $(function() {
                 $('#user-info .user-id').html(data.response.user.id);
                 $('#user-info .user-name').html(data.response.user.firstName);
                 $('#user-info .user-avatar').attr('src',data.response.user.photo);
-                //console.log(data);
                 $.mobile.loading('hide');
                 toast('test');
             },
@@ -92,6 +93,7 @@ $(function() {
     function render_select_page(){
         var fsclient = new FourSquareClient(null, null, null, true);
         var params = { 'll': '53.20445,50.12376', 'radius': 50 };
+        var checkin = function(id){ alert(id); }
         $('#select-place ul li').remove();
         fsclient.venuesClient.explore(params, { 
             onSuccess: function(data) { 
@@ -104,17 +106,23 @@ $(function() {
                     //     'location': { 'lat': item.venue.location.lat, 'lng': item.venue.location.lng},
                     //     'category': item.venue.categories[0].name
                     // });
-                    var ll = 'Lat: ' + item.venue.location.lat + '<br/>Lng: ' + item.venue.location.lng;
-                    $('#select-place ul').append(
-                        $('<li>').append($('<a>').attr('href', '#')
-                                                 .append($('<h3>').append(item.venue.name))
-                                                 .append($('<p>').append(item.venue.categories[0].name)))
-                                 .append($('<span class="ui-li-count">').append(ll))
-                    );
+                    var li    = $('<li>'),
+                        ll    = 'Lat: ' + item.venue.location.lat + '<br/>Lng: ' + item.venue.location.lng,
+                        desc  = $('<p>').append(item.venue.categories[0].name),// + '<br/>ID: ' + item.venue.id,
+                        title = $('<h3>').append(item.venue.name),
+                        count = $('<span class="ui-li-count">').append(ll);
+                        console.log(app_data);
+                    if(item.venue.id == app_data.task.location){
+                      li.attr('data-theme','e')
+                        .append($('<a>').attr('href', '#').append(title).append(desc).click(checkin))
+                        .append(count);
+                    }else{
+                        li.append(title).append(desc).append(count);
+                    }
+                    
+                    $('#select-place ul').append(li);
                 }
                 $('#select-place ul').listview('refresh');
-                //console.log(data.response.groups);
-                
                 //$('#select-place-debug').html(prettyPrint(data.response));
                 //$.dump(data.response.groups[0].items, true);
                 // $.dump(venues, false);
@@ -125,8 +133,8 @@ $(function() {
         });
         
         // Also works with: var yourStartLatLng = '59.3426606750, 18.0736160278';
-        var yourStartLatLng = new google.maps.LatLng(53.21320001, 50.2060001);
-        $('#select-place-map').gmap({'center': yourStartLatLng, 'zoom': 11});
+        //var yourStartLatLng = new google.maps.LatLng(53.21320001, 50.2060001);
+        //$('#select-place-map').gmap({'center': yourStartLatLng, 'zoom': 11});
 
         // $('#select-place-map').gmap().bind('init', function(ev, map) {
         //     $('#select-place-map').gmap('addMarker', {'position': '53.213200,50.206000', 'bounds': false}).click(function() {
@@ -134,9 +142,9 @@ $(function() {
         //     });
         // });
 
-        $('#select-place-map').gmap('addMarker', {'position': '57.7973333,12.0502107', 'bounds': false}).click(function() {
-            $('#select-place-map').gmap('openInfoWindow', {'content': 'Hello World!'}, this);
-        });
+        // $('#select-place-map').gmap('addMarker', {'position': '57.7973333,12.0502107', 'bounds': false}).click(function() {
+        //     $('#select-place-map').gmap('openInfoWindow', {'content': 'Hello World!'}, this);
+        // });
     }
 
     function render_task_page(){
@@ -144,8 +152,9 @@ $(function() {
             url: 'http://app-test.samara-odyssey.dansamara.ru/actions/task.php',
             dataType: 'jsonp',
             success: function(data){
-                if (data.hasOwnProperty('task')) {
-                    $('#task p.current-class').html(data.task);
+                if (data.hasOwnProperty('text')) {
+                    $('#task p.current-class').html(data.text);
+                    app_data.task = data;
                     update_task_map_height();
                 }
             }
@@ -156,27 +165,25 @@ $(function() {
     function update_task_map_height(){
         // $header = $page.children( ":jqmData(role=header)" ),
         // $content = $page.children( ":jqmData(role=content)" ),
-        var map_height = $(window).outerHeight() - 
-                        $('#task div[data-role="header"]').outerHeight() - 
-                        $('#task div[data-role="content"]').outerHeight() -
-                        $('#task .map').outerHeight();
+        var map_height = $(window).outerHeight()
+                         - $('#task div[data-role="header"]').outerHeight()
+                         - $('#task div[data-role="content"]').outerHeight()
+                         - $('#task .map').outerHeight();
         $('#task .map').height(map_height).gmap('refresh');
     }
 
     var toast=function(msg){
         $("<div class='ui-loader ui-overlay-shadow ui-body-e ui-corner-all'><h3>"+msg+"</h3></div>")
         .css({ display: "block",
-        opacity: 0.90,
-        position: "fixed",
-        padding: "7px",
-        "text-align": "center",
-        width: "270px",
-        left: ($(window).width() - 284)/2,
-        top: $(window).height()/2 })
+               opacity: 0.90,
+               position: "fixed",
+               padding: "7px",
+               "text-align": "center",
+               width: "270px",
+               left: ($(window).width() - 284)/2,
+               top: $(window).height()/2 })
         .appendTo( $.mobile.pageContainer ).delay( 1500 )
-        .fadeOut( 400, function(){
-        $(this).remove();
-        });
+        .fadeOut( 400, function(){ $(this).remove(); });
     }
 
     $(init);

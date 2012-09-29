@@ -212,7 +212,7 @@ FourSquareUtils =
 	{
 		var request = new XMLHttpRequest();
 	    var method = (method) ? method : "GET";
-			    
+
 	    request.open(method, url, true);	    
 	    request.onreadystatechange = function(event) 
 	    {
