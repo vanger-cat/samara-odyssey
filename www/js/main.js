@@ -21,6 +21,7 @@ $(function() {
 
     function onPageChange(event, data) {
         switch(data.toPage.attr('id')){
+            case 'task': update_task_map(); break;
             case 'checkin': render_checkin_page(); break;
             case 'select-place': render_select_page(); break;
             case 'checkin-result': render_checkin_result_page(); break;
@@ -84,7 +85,7 @@ $(function() {
             $('#checkin img.photo').attr('src', "data:image/jpeg;base64," + imageData).show();
         };
         var onFailure = function(){};
-        var params = { quality: 70, allowEdit: true, destinationType: Camera.DestinationType.DATA_URL };
+        var params = { quality: 20, destinationType: Camera.DestinationType.DATA_URL };
         navigator.camera.getPicture(onSuccess, onFailure, params);
     }
 
