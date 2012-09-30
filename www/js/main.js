@@ -7,14 +7,15 @@ $(function() {
         var d = $(document);
         d.bind("pagechange", onPageChange);
         d.bind("pageinit", onPageInit);
-        render_loding_page();
+        build_loding_page();
     }
     
     function onPageInit(event) {
         switch ($(event.target).attr('id')) {
-            case 'login': render_login_page(); break;
-            case 'task': render_task_page(); break;
-            case 'loading': render_loding_page(); break;
+            case 'login': build_login_page(); break;
+            case 'task': build_task_page(); break;
+            case 'loading': build_loding_page(); break;
+            case 'checkin': build_checkin_page(); break;
         }
     }
 
@@ -26,7 +27,7 @@ $(function() {
         }
     }
 
-    function render_loding_page(){
+    function build_loding_page(){
         // Проверка токена
         $.mobile.loading('show');
         var switch_to_login = function(){
@@ -47,7 +48,7 @@ $(function() {
         }
     }
 
-    function render_login_page(){
+    function build_login_page(){
         var access_keys = { 'fs_access_token': "ZPIFQ24SSJW2IZROKZ3MM5BPFXUA5OHI0DCH44HUTLFOQ3OY",
                             'fs_client_id': "B1DDKTTHYTZELCCAH3UDX2FLM3SV5YGEV3ORZDPN5Q50TGG0",
                             'fs_client_secret': "14AIKY23DMTZ4YOOLLHI4I5A2OTZIEOT5TOPVNJ1NPYWYTK4",
@@ -71,12 +72,28 @@ $(function() {
         });
     }
 
-    function checkin(){
+    function build_checkin_page(){
+        $('#checkin a.checkin').click(do_checkin);
+        $('#checkin a.photo').click(do_photo);
+    }
+    
+    function do_photo(){
+        var onSuccess = function(imageData){            
+            $('#checkin a.checkin').show();
+            $('#checkin a.photo').hide();
+            $('#checkin img.photo').attr('src', "data:image/jpeg;base64," + imageData).show();
+        };
+        var onFailure = function(){};
+        var params = { quality: 70, allowEdit: true, destinationType: Camera.DestinationType.DATA_URL };
+        navigator.camera.getPicture(onSuccess, onFailure, params);
+    }
+
+    function do_checkin(){
         var fsclient = new FourSquareClient(null, null, null, true);
         var params = { 'venueId': app_data.task.location, 'shout': $('#comment').val()};
         fsclient.checkinsClient.add(params, {
             onSuccess: function(data){
-                $('#checkin-result div[data-role="content"]').html('OK!');
+                $('#checkin-result div[data-role="content"]').html('OK!<br/>ID:' + data.id);
                 $.mobile.changePage($('#checkin-result'));
             },
             onFailure: function(data){
@@ -87,8 +104,12 @@ $(function() {
 
     function render_checkin_page(){
         $.mobile.loading('show');
+
+        $('#checkin img.photo').hide();
+        $('#checkin a.checkin').hide();
+        $('#checkin a.photo').show();
+
         var fsclient = new FourSquareClient(null, null, null, true);
-        $('#checkin a.checkin').click(checkin);
         fsclient.usersClient.users('self', { 
             onSuccess: function(data) { 
                 $('#checkin .user-id').html(data.response.user.id);
@@ -186,7 +207,7 @@ $(function() {
         // });
     }
 
-    function render_task_page(){
+    function build_task_page(){
         //$.mobile.loading('show');
         $.ajax({
             url: 'http://app-test.samara-odyssey.dansamara.ru/actions/task.php',
