@@ -15,6 +15,11 @@ $(function() {
 
             pictureSource=navigator.camera.PictureSourceType;
             destinationType=navigator.camera.DestinationType;
+            
+            $('a.capturePhoto').click(capturePhoto);
+            $('a.capturePhotoEdit').click(capturePhotoEdit);
+            $('a.getPhoto1').click(getPhoto1);
+            $('a.getPhoto1').click(getPhoto2);
 
     }
     
