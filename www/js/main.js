@@ -12,6 +12,10 @@ $(function() {
         d.bind("pagechange", onPageChange);
         d.bind("pageinit", onPageInit);
         build_loding_page();
+
+            pictureSource=navigator.camera.PictureSourceType;
+            destinationType=navigator.camera.DestinationType;
+
     }
     
     function onPageInit(event) {
@@ -270,4 +274,65 @@ $(function() {
     
     document.addEventListener('deviceready', init, false);
     $(init);
+
+            var pictureSource; // picture source
+            var destinationType; // sets the format of returned value
+            
+            //if we've captured photo succesfully
+            function onPhotoSuccess(imageData)
+            {
+                // Get image handle
+                var smallImage = document.getElementById('cameraSmallImage');
+                
+                // Unhide image elements
+                smallImage.style.display = 'block';
+                
+                // Show the captured photo
+                // holy mother of God - image received as string:)
+                smallImage.src = "data:image/jpeg;base64," + imageData;
+            }
+            
+            //photo taken and URI sent to JavaScript
+            function onPhotoURISuccess( photoURI )
+            {
+                // Get image handle
+                var largeImage = document.getElementById('cameraLargeImage');
+                
+                // Unhide image elements
+                largeImage.style.display = 'block';
+                
+                // Show the captured photo
+                // The inline CSS rules are used to resize the image
+                largeImage.src = imageURI;
+            }
+            
+            // Something bad happened! We need something to do!
+            function onFail(message) {
+                alert('Failed because: ' + message);
+            }
+            
+            
+            //capture photo and return image as base-64 string
+            function capturePhoto() {
+                // Take picture using device camera and retrieve image as base64-encoded string
+                navigator.camera.getPicture(onPhotoSuccess, onFail, { quality: 50,
+                                            destinationType: destinationType.DATA_URL });
+            }
+            
+            // A button will call this function
+            //
+            function capturePhotoEdit() {
+                // Take picture using device camera, allow edit, and retrieve image as base64-encoded string
+                navigator.camera.getPicture(onPhotoSuccess, onFail, { quality: 20, allowEdit: true,
+                                            destinationType: destinationType.DATA_URL });
+            }
+            
+            // A button will call this function
+            function getPhoto(source) {
+                // Retrieve image file location from specified source
+                navigator.camera.getPicture(onPhotoURISuccess, onFail, { quality: 50,
+                                            destinationType: destinationType.FILE_URI,
+                                            sourceType: source });
+            }
+
 });
