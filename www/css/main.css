@@ -8,3 +8,4 @@
 .user-avatar { float: left; margin-right: 10px; }
 #checkin .user-info { width: 48%; margin-right: 2%; min-height: 110px; }
 #checkin .place-info .pane { padding: 0 10px; min-height: 110px; }
+#checkin img.photo { height: 30px; width: 100px; }

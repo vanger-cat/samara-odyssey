@@ -1,6 +1,10 @@
 $(function() {
+    // jQuery.data()?
     var app_data = {
-        'radius': 300
+        'radius': 300,
+        'task_url': 'http://app-test.samara-odyssey.dansamara.ru/actions/task.php',
+        // 'default_location': '53.21320001, 50.2060001'
+        'default_location': '53.18955,50.13695'
     }
 
     function init(){
@@ -50,7 +54,7 @@ $(function() {
     }
 
     function build_login_page(){
-        var access_keys = { 'fs_access_token': "ZPIFQ24SSJW2IZROKZ3MM5BPFXUA5OHI0DCH44HUTLFOQ3OY",
+        var access_keys = { 'fs_access_token': "K1R4X0DTYE54OV0ZCRMIY2GH4RNZTDDVBX4FGIZGLVGMSUJ4",
                             'fs_client_id': "B1DDKTTHYTZELCCAH3UDX2FLM3SV5YGEV3ORZDPN5Q50TGG0",
                             'fs_client_secret': "14AIKY23DMTZ4YOOLLHI4I5A2OTZIEOT5TOPVNJ1NPYWYTK4",
                             'fs_redirect_uri': 'http://app-test.samara-odyssey.dansamara.ru/' };
@@ -91,7 +95,7 @@ $(function() {
 
     function do_checkin(){
         var fsclient = new FourSquareClient(null, null, null, true);
-        var params = { 'venueId': app_data.task.location, 'shout': $('#comment').val()};
+        var params = { 'venueId': app_data.current_venue_id, 'shout': $('#comment').val()};
         fsclient.checkinsClient.add(params, {
             onSuccess: function(data){
                 $('#checkin-result div[data-role="content"]').html('OK!<br/>ID:' + data.id);
@@ -123,7 +127,7 @@ $(function() {
                 $.mobile.loading('hide');
             }
         });
-        fsclient.venuesClient.venues(app_data.task.location, { 
+        fsclient.venuesClient.venues(app_data.current_venue_id, { 
             onSuccess: function(data) { 
                 $('#checkin .place-name').html(data.response.venue.name);
                 $('#checkin .place-desc').html(data.response.venue.categories[0].name);
@@ -138,22 +142,27 @@ $(function() {
         $('#select-place ul li').remove();
 
         navigator.geolocation.getCurrentPosition(
-            /*onSuccess*/ function(position){
-                show_places(position.coords);
+            function(position){ /*onSuccess*/
+                show_places(position.coords.latitude + ', ' + position.coords.longitude);
             },
-            /*onError*/ function(error){
+            function(error){ /*onError*/
+                alert('Текщее местоположение определить не удалось. Используем координаты по умолчанию.');
+                show_places(app_data.default_location);
             }
         );
     }
 
-    function show_places(coords){
+    function show_places(location){
         $.mobile.loading('show');
         var fsclient = new FourSquareClient(null, null, null, true);
-        var params = { 'll': coords.latitude + ', ' + coords.longitude, 'radius': app_data.radius };
-        var checkin = function(id){ $.mobile.changePage($('#checkin')); }
+        var params = { 'll': location, 'radius': app_data.radius };
+        var locations = [];
+        for (var i = app_data.tasks.length - 1; i >= 0; i--) {
+            locations.push(app_data.tasks[i].location);
+        };
         fsclient.venuesClient.explore(params, { 
             onSuccess: function(data) {
-                console.log(data);
+                //console.log(data);
                 var venues = [];
                 for(var i=0; i < data.response.groups[0].items.length; i++){
                     item = data.response.groups[0].items[i];
@@ -168,15 +177,18 @@ $(function() {
                         desc  = $('<p>').append(item.venue.categories[0].name + ' ID: ' + item.venue.id),
                         title = $('<h3>').append(item.venue.name),
                         count = $('<span class="ui-li-count">').append(ll);
-                        console.log(app_data);
-                    if(item.venue.id == app_data.task.location){
-                      li.attr('data-theme','e')
-                        .append($('<a>').attr('href', '#').append(title).append(desc).click(checkin))
+                    if(locations.indexOf(item.venue.id) != -1){
+                        var venue_id = item.venue.id;
+                        li.attr('data-theme','e')
+                        .append($('<a>').attr('href', '#').append(title).append(desc).click(function(){
+                            app_data.current_venue_id = venue_id;
+                            $.mobile.changePage($('#checkin'));
+                        }))
                         .append(count);
                     }else{
-                        //li.append(title).append(desc).append(count);
-                      li.append($('<a>').attr('href', '#').append(title).append(desc).click(checkin))
-                        .append(count);
+                        li.append(title).append(desc).append(count);
+                      // li.append($('<a>').attr('href', '#').append(title).append(desc).click(checkin))
+                        // .append(count);
                     }
                     
                     $('#select-place ul').append(li);
@@ -192,33 +204,23 @@ $(function() {
                 $.mobile.loading('hide');
             }
         });
-        
-        // Also works with: var yourStartLatLng = '59.3426606750, 18.0736160278';
-        //var yourStartLatLng = new google.maps.LatLng(53.21320001, 50.2060001);
-        //$('#select-place-map').gmap({'center': yourStartLatLng, 'zoom': 11});
-
-        // $('#select-place-map').gmap().bind('init', function(ev, map) {
-        //     $('#select-place-map').gmap('addMarker', {'position': '53.213200,50.206000', 'bounds': false}).click(function() {
-        //         $('#select-place-map').gmap('openInfoWindow', {'content': 'Hello World!'}, this);
-        //     });
-        // });
-
-        // $('#select-place-map').gmap('addMarker', {'position': '57.7973333,12.0502107', 'bounds': false}).click(function() {
-        //     $('#select-place-map').gmap('openInfoWindow', {'content': 'Hello World!'}, this);
-        // });
     }
 
     function build_task_page(){
         //$.mobile.loading('show');
         $.ajax({
-            url: 'http://app-test.samara-odyssey.dansamara.ru/actions/task.php',
+            url: app_data.task_url,
             dataType: 'jsonp',
             success: function(data){
-                if (data.hasOwnProperty('text')) {
-                    $('#task p.current-class').html(data.text);
-                    app_data.task = data;
+                if (data.hasOwnProperty('tasks')) {
+                    ul = $('<ul>');
+                    for(var i = 0; i < data.tasks.length; i++){
+                        ul.append($('<li>').append(data.tasks[i].text));
+                    }
+                    $('#task p.current-class').html(ul);
+                    app_data.tasks = data.tasks;
                     update_task_map_height();
-                    $('#task .map').gmap({'center': '53.21320001, 50.2060001', 'zoom': 13});
+                    $('#task .map').gmap({'center': app_data.default_location, 'zoom': 13});
                     $('#task .map-wrapper').bind('tap', update_task_map);
                 }
             }
