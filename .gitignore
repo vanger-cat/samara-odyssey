@@ -1,3 +1,4 @@
-﻿# OS X
+# OS X
 .DS_Store
 build
+Gemfile.lock
