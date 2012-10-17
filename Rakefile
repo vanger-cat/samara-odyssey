@@ -3,7 +3,7 @@ include Rake::DSL
 require 'bundler'
 Bundler.require
 
-Wox::Tasks.create :info_plist => 'Resources/Info.plist', :sdk => 'iphoneos', :configuration => 'Release' do
+Wox::Tasks.create :info_plist => 'Odyssey/Odyssey-Info.plist', :sdk => 'iphoneos', :configuration => 'Release' do
   build :debug, :configuration => 'Debug'
 
   build :release, :developer_certificate => 'iPhone Distribution: Flexis ZAO' do
