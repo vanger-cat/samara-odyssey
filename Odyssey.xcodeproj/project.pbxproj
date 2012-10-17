@@ -42,12 +42,12 @@
 		30E1352710E2C1420031B30D /* Cordova.plist in Resources */ = {isa = PBXBuildFile; fileRef = 30E1352610E2C1420031B30D /* Cordova.plist */; };
 		30E5649213A7FCAF007403D8 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30E5649113A7FCAF007403D8 /* CoreMedia.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		40BF0533162E718000DBF5E1 /* ChildBrowser.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 40BF0526162E718000DBF5E1 /* ChildBrowser.bundle */; };
-		40BF0534162E718000DBF5E1 /* ChildBrowser.js in Sources */ = {isa = PBXBuildFile; fileRef = 40BF0527162E718000DBF5E1 /* ChildBrowser.js */; };
+		40BF0534162E718000DBF5E1 /* ChildBrowser.js in Resources */ = {isa = PBXBuildFile; fileRef = 40BF0527162E718000DBF5E1 /* ChildBrowser.js */; };
 		40BF0535162E718000DBF5E1 /* ChildBrowserCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 40BF0529162E718000DBF5E1 /* ChildBrowserCommand.m */; };
 		40BF0536162E718000DBF5E1 /* ChildBrowserViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 40BF052B162E718000DBF5E1 /* ChildBrowserViewController.m */; };
 		40BF0537162E718000DBF5E1 /* ChildBrowserViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 40BF052C162E718000DBF5E1 /* ChildBrowserViewController.xib */; };
 		40BF0538162E718000DBF5E1 /* facebook.html in Resources */ = {isa = PBXBuildFile; fileRef = 40BF052E162E718000DBF5E1 /* facebook.html */; };
-		40BF0539162E718000DBF5E1 /* FBConnect.js in Sources */ = {isa = PBXBuildFile; fileRef = 40BF052F162E718000DBF5E1 /* FBConnect.js */; };
+		40BF0539162E718000DBF5E1 /* FBConnect.js in Resources */ = {isa = PBXBuildFile; fileRef = 40BF052F162E718000DBF5E1 /* FBConnect.js */; };
 		40BF053A162E718000DBF5E1 /* index.html in Resources */ = {isa = PBXBuildFile; fileRef = 40BF0530162E718000DBF5E1 /* index.html */; };
 		40BF053B162E718000DBF5E1 /* README.txt in Resources */ = {isa = PBXBuildFile; fileRef = 40BF0531162E718000DBF5E1 /* README.txt */; };
 		40BF053C162E718000DBF5E1 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 40BF0532162E718000DBF5E1 /* README.md */; };
@@ -372,6 +372,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				40BF0534162E718000DBF5E1 /* ChildBrowser.js in Resources */,
+				40BF0539162E718000DBF5E1 /* FBConnect.js in Resources */,
 				301BF570109A69640062928A /* www in Resources */,
 				30E1352710E2C1420031B30D /* Cordova.plist in Resources */,
 				308D05371370CCF300D202BF /* icon-72.png in Resources */,
@@ -426,10 +428,8 @@
 				1D60589B0D05DD56006BFB54 /* main.m in Sources */,
 				1D3623260D0F684500981E51 /* AppDelegate.m in Sources */,
 				302D95F114D2391D003F00A1 /* MainViewController.m in Sources */,
-				40BF0534162E718000DBF5E1 /* ChildBrowser.js in Sources */,
 				40BF0535162E718000DBF5E1 /* ChildBrowserCommand.m in Sources */,
 				40BF0536162E718000DBF5E1 /* ChildBrowserViewController.m in Sources */,
-				40BF0539162E718000DBF5E1 /* FBConnect.js in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
